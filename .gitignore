@@ -1,0 +1,6 @@
+/.vscode
+/engine.o
+/kaiserVision.exe
+/Kaiser_vision.o
+/shaders.o
+/triangle.cpp
