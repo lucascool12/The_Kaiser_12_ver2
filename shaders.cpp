@@ -4,33 +4,30 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glext.h>
+#include <iostream>
+#include <stdio.h>
+#include <fstream>
+#include <streambuf>
 #include "header.h"
 
 GLuint MakeShader(std::string shader, GLenum type);
 GLuint LinkProgram(GLuint vertex);
-void cursed();
-
-std::string vertexShader = R"(
-    #version 430
-    layout(location = 0) in vec2 pos;
-    void main()
-    {
-        gl_Position = vec4(pos, 0, 1);
-    }
-)";
-
-
-std::string fragmentShader = R"(
-    #version 430
-    out vec4 outputColor;
-    void main() 
-    {
-        outputColor = vec4(1, 1, 1, 1); // white color
-    }
-)";
 
 GLuint CompileAllShaders(){
     glClearColor(1, 0, 0, 0);
+
+    std::ifstream vertex_file;
+    std::ifstream frag_file;
+
+    vertex_file.open("vertexShader.vert");
+    frag_file.open("fragShader.frag");
+
+    std::string vertexShader((std::istreambuf_iterator<char>(vertex_file)),std::istreambuf_iterator<char>());
+    std::string fragmentShader((std::istreambuf_iterator<char>(frag_file)),std::istreambuf_iterator<char>());
+
+    vertex_file.close();
+    frag_file.close();
+
     GLuint vertexShaderID = MakeShader(vertexShader, GL_VERTEX_SHADER);
     GLuint fragmentShaderID = MakeShader(fragmentShader, GL_FRAGMENT_SHADER);
 
@@ -39,19 +36,23 @@ GLuint CompileAllShaders(){
     glAttachShader(programID, fragmentShaderID);
     glLinkProgram(programID);
 
+    GLint linkStatus;
+
+    
+    glGetProgramiv(programID, GL_LINK_STATUS, &linkStatus);
+    if (!linkStatus) {
+        printf("Error Linking program");
+        glDetachShader(programID, vertexShaderID);
+        glDetachShader(programID, fragmentShaderID);
+        glDeleteProgram(programID);
+
+        return 0;
+    }
+
     //cursed();
 
     return programID;
 }
-
-void cursed(){
-    GLuint vaoId;
-    glGenVertexArrays(1, &vaoId);
-    glBindVertexArray(vaoId);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-}
-
 
 GLuint LinkProgram(GLuint vertex){
     GLuint programID = glCreateProgram();
@@ -69,5 +70,21 @@ GLuint MakeShader(std::string shader, GLenum type) {
     glShaderSource(shaderId, 1, &shaderCode, NULL);
     glCompileShader(shaderId);
 
+    GLint compileStatus;
+    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileStatus);
+
+    if (!compileStatus) {
+        int length;
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &length);
+        char *cMessage = new char[length];
+
+        // Get additional information
+        glGetShaderInfoLog(shaderId, length, &length, cMessage);
+        printf("Cannot Compile Shader: %s", cMessage);
+        delete[] cMessage;
+        glDeleteShader(shaderId);
+        return 0;
+    }
+    
     return shaderId;
 }
