@@ -19,12 +19,11 @@ GLuint CompileAllShaders(){
     std::ifstream vertex_file;
     std::ifstream frag_file;
 
-    vertex_file.open("vertexShader.vert");
+    vertex_file.open("transformationShader.vert"); //!!!!
     frag_file.open("fragShader.frag");
 
     std::string vertexShader((std::istreambuf_iterator<char>(vertex_file)),std::istreambuf_iterator<char>());
     std::string fragmentShader((std::istreambuf_iterator<char>(frag_file)),std::istreambuf_iterator<char>());
-
     vertex_file.close();
     frag_file.close();
 

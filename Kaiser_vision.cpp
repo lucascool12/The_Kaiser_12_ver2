@@ -5,6 +5,7 @@
 #include <GL/glext.h>
 #include <stdio.h>
 #include <chrono>
+#include <cmath>
 #include "header.h"
 
 
@@ -12,44 +13,59 @@ GLuint vBufferObjID;
 GLuint programID;
 
 GLfloat verts[] = {
-        -1.0,  1.0,
-        1.0,  1.0,
+        -0.5,  0.5,
+        0.5,  0.5,
         0,  -0.5
     };
 
-GLuint elapsedTimeUniform;
-GLuint moveSelf;
-GLuint mousePosition;
-GLuint windowDimension;
-GLuint timeDif;
+// GLuint elapsedTimeUniform;
+// GLuint moveSelf;
+// GLuint mousePosition;
+// GLuint windowDimension;
+// GLuint timeDif;
 
 int global_button,global_state;
 int timeSnapshot;
 
-void Init() {
-    programID = CompileAllShaders();
+GLuint rot;
+GLuint oPos;
+GLuint scale;
 
-    elapsedTimeUniform = glGetUniformLocation(programID,"time");
-    moveSelf = glGetUniformLocation(programID,"mouseDown");
-    mousePosition = glGetUniformLocation(programID, "mousePos");
-    windowDimension = glGetUniformLocation(programID, "window");
-    timeDif = glGetUniformLocation(programID, "timeDif");
+void Init() {
+    programID = CompileAllShaders();// trans vert
+
+    // elapsedTimeUniform = glGetUniformLocation(programID,"time");
+    // moveSelf = glGetUniformLocation(programID,"mouseDown");
+    // mousePosition = glGetUniformLocation(programID, "mousePos");
+    // windowDimension = glGetUniformLocation(programID, "window");
+    // timeDif = glGetUniformLocation(programID, "timeDif");
+
+    rot = glGetUniformLocation(programID,"rotAngle");
+    oPos = glGetUniformLocation(programID,"oPos");
+    scale = glGetUniformLocation(programID,"scale");
 
     glGenBuffers(1, &vBufferObjID);
     glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); //clears buffer
 }
+void transform(GLfloat oPos1,GLfloat oPos2, GLfloat s, GLfloat rotate){
+    glUniform2f(oPos,oPos1,oPos2);
+    glUniform1f(scale,s);
+    glUniform1f(rot,rotate*(M_PI)/180.0);
+}
 
 void Display(){
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(programID);
-    glUniform1f(elapsedTimeUniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
-
+    //glUniform1f(elapsedTimeUniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
+    transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,0,1,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
     glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -71,95 +87,95 @@ void MakeWindow(int argc, char **argv){
 }
 
 
-void mouseStateChanged(int button, int state, int x, int y){
-    global_button = button;
-    global_state = state;
+// void mouseStateChanged(int button, int state, int x, int y){
+//     global_button = button;
+//     global_state = state;
 
-    glUseProgram(programID);
+//     glUseProgram(programID);
     
-    if(global_button == GLUT_LEFT_BUTTON && state == 1){ //press
-        glUniform1i(moveSelf, false);
+//     if(global_button == GLUT_LEFT_BUTTON && state == 1){ //press
+//         glUniform1i(moveSelf, false);
 
-        // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
-        // GLfloat oldvec[6];
-        // glGetBufferSubData(GL_ARRAY_BUFFER,0,sizeof(verts),&oldvec);
-        // GLfloat newvec[sizeof(verts)/4];
-        // for(int i = 0; i < 3; i++)
-        //     printf("A%f B%f ", oldvec[2*i], oldvec[2*i+1]);
+//         // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
+//         // GLfloat oldvec[6];
+//         // glGetBufferSubData(GL_ARRAY_BUFFER,0,sizeof(verts),&oldvec);
+//         // GLfloat newvec[sizeof(verts)/4];
+//         // for(int i = 0; i < 3; i++)
+//         //     printf("A%f B%f ", oldvec[2*i], oldvec[2*i+1]);
 
-        // printf("\n"); 
+//         // printf("\n"); 
 
-        // for(int i = 0; i< 3; i++){
-        //     newvec[2*i] = oldvec[2*i];
-        //     newvec[2*i + 1] = oldvec[2*i + 1];
-        // }
-        // printf("%d\n",sizeof(newvec)/4);
+//         // for(int i = 0; i< 3; i++){
+//         //     newvec[2*i] = oldvec[2*i];
+//         //     newvec[2*i + 1] = oldvec[2*i + 1];
+//         // }
+//         // printf("%d\n",sizeof(newvec)/4);
         
-        // for(int i = 0; i < sizeof(newvec)/(4*2);i++)
-        // printf("Z%f X%f ",newvec[2*i],newvec[2*i+1]);
-        // printf("X %d Y %d xl %d yl %d",x,y,glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT));
-        // printf("\n\n");
-        // //glBufferData(GL_ARRAY_BUFFER,sizeof(newvec),newvec,GL_STREAM_DRAW);
-        // glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(newvec),&newvec[0]);
-        // glBindBuffer(GL_ARRAY_BUFFER,0);
+//         // for(int i = 0; i < sizeof(newvec)/(4*2);i++)
+//         // printf("Z%f X%f ",newvec[2*i],newvec[2*i+1]);
+//         // printf("X %d Y %d xl %d yl %d",x,y,glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT));
+//         // printf("\n\n");
+//         // //glBufferData(GL_ARRAY_BUFFER,sizeof(newvec),newvec,GL_STREAM_DRAW);
+//         // glBufferSubData(GL_ARRAY_BUFFER,0,sizeof(newvec),&newvec[0]);
+//         // glBindBuffer(GL_ARRAY_BUFFER,0);
 
-    } else if(global_button == GLUT_LEFT_BUTTON){ //release 
-        glUniform1i(moveSelf, true);
-        glUniform2f(mousePosition, (GLfloat)x, (GLfloat)y);
-        glUniform2f(windowDimension,(GLfloat)glutGet(GLUT_WINDOW_WIDTH), (GLfloat)glutGet(GLUT_WINDOW_HEIGHT));
-    }
+//     } else if(global_button == GLUT_LEFT_BUTTON){ //release 
+//         glUniform1i(moveSelf, true);
+//         glUniform2f(mousePosition, (GLfloat)x, (GLfloat)y);
+//         glUniform2f(windowDimension,(GLfloat)glutGet(GLUT_WINDOW_WIDTH), (GLfloat)glutGet(GLUT_WINDOW_HEIGHT));
+//     }
     
 
-    glUseProgram(0);
-}
+//     glUseProgram(0);
+// }
 
-#if defined FPS
-    int frames = 0;
-    std::chrono::_V2::steady_clock::time_point start;
+// #if defined FPS
+//     int frames = 0;
+//     std::chrono::_V2::steady_clock::time_point start;
 
-    void FPS(){
-        frames++;
-        if(frames<2){
-            start = std::chrono::steady_clock::now();
-        }else{
-            auto end = std::chrono::steady_clock::now();
-            int64_t tiime= std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-            printf("%f\n",1000000000.0/((float)tiime));
-            frames = 0;
-        }
-    }
-#endif
+//     void FPS(){
+//         frames++;
+//         if(frames<2){
+//             start = std::chrono::steady_clock::now();
+//         }else{
+//             auto end = std::chrono::steady_clock::now();
+//             int64_t tiime= std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+//             printf("%f\n",1000000000.0/((float)tiime));
+//             frames = 0;
+//         }
+//     }
+// #endif
  
-void mouseMove(int x, int y){
-    if(global_button == GLUT_LEFT_BUTTON || global_state == 0){
-        #if defined FPS
-            FPS();
-        #endif
-        glUseProgram(programID);
+// void mouseMove(int x, int y){
+//     if(global_button == GLUT_LEFT_BUTTON || global_state == 0){
+//         #if defined FPS
+//             FPS();
+//         #endif
+//         glUseProgram(programID);
 
-        glClear(GL_COLOR_BUFFER_BIT);
+//         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
+//         glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
 
-        glUniform2f(mousePosition, (GLfloat)x, (GLfloat)y);
+//         glUniform2f(mousePosition, (GLfloat)x, (GLfloat)y);
 
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+//         glEnableVertexAttribArray(0);
+//         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+//         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUseProgram(0);
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-    }
+//         glUseProgram(0);
+//         glBindBuffer(GL_ARRAY_BUFFER,0);
+//     }
 
-}
+// }
 
 int main(int argc, char **argv){
     MakeWindow(argc,argv);
     Init();
 
-    glutMotionFunc(mouseMove);
-    glutMouseFunc(mouseStateChanged);
+    //glutMotionFunc(mouseMove);
+    //glutMouseFunc(mouseStateChanged);
     glutDisplayFunc(Display);
 
     glutMainLoop();
