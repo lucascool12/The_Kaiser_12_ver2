@@ -10,6 +10,7 @@
 
 
 GLuint vBufferObjID;
+GLuint vBufferObjID2;
 GLuint programID;
 
 GLfloat verts[] = {
@@ -43,9 +44,13 @@ void Init() {
     rot = glGetUniformLocation(programID,"rotAngle");
     oPos = glGetUniformLocation(programID,"oPos");
     scale = glGetUniformLocation(programID,"scale");
-
-    glGenBuffers(1, &vBufferObjID);
+    GLuint temp_array[2];
+    glGenBuffers(2, temp_array);
+    vBufferObjID = temp_array[0];
+    vBufferObjID2 = temp_array[1];
     glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); //clears buffer
 }
@@ -60,8 +65,8 @@ void Display(){
 
     glUseProgram(programID);
     //glUniform1f(elapsedTimeUniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
-    transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,0,1,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
-    printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,-0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
     glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -70,6 +75,19 @@ void Display(){
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glDisableVertexAttribArray(0);
+
+    
+    transform((-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1+0.5,0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.5,(-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDisableVertexAttribArray(0);
+
 
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glUseProgram(0);
@@ -81,8 +99,8 @@ void MakeWindow(int argc, char **argv){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutInitWindowPosition(500, 500);
-    glutCreateWindow("OpenGL Testing");
+    glutInitWindowPosition(0, 0);
+    glutCreateWindow("my dick is bigger than yours ayami");
     glewInit();
 }
 
