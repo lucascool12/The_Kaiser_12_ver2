@@ -38,52 +38,87 @@ void Engine::shaderProgram::init(std::vector<std::string> Shaders,std::vector<GL
     }
 }
 
-void Engine::shaderProgram::Uniform1f(GLfloat v0){
-    glUniform1f(id,v0);
+int Engine::shaderProgram::getAndSaveUniform(string var){
+    if(vars.find(var) == vars.end()){
+        GLuint uniId;
+        uniId = glGetUniformLocation(id,var.c_str());
+        if(uniId == -1) return 1;
+        vars[var] = uniId;
+        return 0;
+    }
 }
 
-void Engine::shaderProgram::Uniform2f(GLfloat v0, GLfloat v1){
-    glUniform2f(id,v0,v1);
+int Engine::shaderProgram::Uniform1f(string var, GLfloat v0){
+    //hash map to find already used variables?
+    if(getAndSaveUniform(var)) return 1;
+    glUniform1f(vars[var],v0);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform3f(GLfloat v0, GLfloat v1, GLfloat v2){
-    glUniform3f(id,v0,v1,v2);
+int Engine::shaderProgram::Uniform2f(string var, GLfloat v0, GLfloat v1){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform2f(vars[var],v0,v1);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform4f(GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3){
-    glUniform4f(id,v0,v1,v2,v3);
+int Engine::shaderProgram::Uniform3f(string var, GLfloat v0, GLfloat v1, GLfloat v2){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform3f(vars[var],v0,v1,v2);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform1i(GLint v0){
-    glUniform1i(id,v0);
+int Engine::shaderProgram::Uniform4f(string var, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform4f(vars[var],v0,v1,v2,v3);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform2i(GLint v0, GLint v1){
-    glUniform2i(id,v0,v1);
+int Engine::shaderProgram::Uniform1i(string var, GLint v0){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform1i(vars[var],v0);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform3i(GLint v0, GLint v1, GLint v2){
-    glUniform3i(id,v0,v1,v2);
+int Engine::shaderProgram::Uniform2i(string var, GLint v0, GLint v1){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform2i(vars[var],v0,v1);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform4i(GLint v0, GLint v1, GLint v2, GLint v3){
-    glUniform4i(id,v0,v1,v2,v3);
+int Engine::shaderProgram::Uniform3i(string var,GLint v0, GLint v1, GLint v2){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform3i(vars[var],v0,v1,v2);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform1ui(GLuint v0){
-    glUniform1ui(id,v0);
+int Engine::shaderProgram::Uniform4i(string var, GLint v0, GLint v1, GLint v2, GLint v3){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform4i(vars[var],v0,v1,v2,v3);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform2ui(GLuint v0, GLuint v1){
-    glUniform2ui(id,v0,v1);
+int Engine::shaderProgram::Uniform1ui(string var, GLuint v0){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform1ui(vars[var],v0);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform3ui(GLuint v0, GLuint v1, GLuint v2){
-    glUniform3ui(id,v0,v1,v2);
+int Engine::shaderProgram::Uniform2ui(string var, GLuint v0, GLuint v1){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform2ui(vars[var],v0,v1);
+    return 0;
 }
 
-void Engine::shaderProgram::Uniform4ui(GLuint v0, GLuint v1, GLuint v2, GLuint v3){
-    glUniform4ui(id,v0,v1,v2,v3);
+int Engine::shaderProgram::Uniform3ui(string var, GLuint v0, GLuint v1, GLuint v2){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform3ui(vars[var],v0,v1,v2);
+    return 0;
+}
+
+int Engine::shaderProgram::Uniform4ui(string var, GLuint v0, GLuint v1, GLuint v2, GLuint v3){
+    if(getAndSaveUniform(var)) return 1;
+    glUniform4ui(vars[var],v0,v1,v2,v3);
+    return 0;
 }
 
 

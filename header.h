@@ -5,6 +5,7 @@
 #include <GL/glext.h>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
@@ -26,24 +27,27 @@ namespace Engine{
             void draw(float oP, float zr, float sc);
     };
     class shaderProgram{
+        private:
+            int getAndSaveUniform(string var);
         public:
             GLuint id = 0;
+            std::unordered_map<string, GLuint> vars;
             void init(vector<string> Shaders, std::vector<GLenum> identifier);
 
             //gl uniform functions
-            void Uniform1f(GLfloat v0);
-            void Uniform2f(GLfloat v0, GLfloat v1);
-            void Uniform3f(GLfloat v0, GLfloat v1, GLfloat v2);
-            void Uniform4f(GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+            int Uniform1f(string var, GLfloat v0);
+            int Uniform2f(string var, GLfloat v0, GLfloat v1);
+            int Uniform3f(string var, GLfloat v0, GLfloat v1, GLfloat v2);
+            int Uniform4f(string var, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 
-            void Uniform1i(GLint v0);
-            void Uniform2i(GLint v0, GLint v1);
-            void Uniform3i(GLint v0, GLint v1, GLint v2);
-            void Uniform4i(GLint v0, GLint v1, GLint v2, GLint v3);
+            int Uniform1i(string var, GLint v0);
+            int Uniform2i(string var, GLint v0, GLint v1);
+            int Uniform3i(string var, GLint v0, GLint v1, GLint v2);
+            int Uniform4i(string var, GLint v0, GLint v1, GLint v2, GLint v3);
 
-            void Uniform1ui(GLuint v0);
-            void Uniform2ui(GLuint v0, GLuint v1);
-            void Uniform3ui(GLuint v0, GLuint v1, GLuint v2);
-            void Uniform4ui(GLuint v0, GLuint v1, GLuint v2, GLuint v3);
+            int Uniform1ui(string var, GLuint v0);
+            int Uniform2ui(string var, GLuint v0, GLuint v1);
+            int Uniform3ui(string var, GLuint v0, GLuint v1, GLuint v2);
+            int Uniform4ui(string var, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
     };
 };
