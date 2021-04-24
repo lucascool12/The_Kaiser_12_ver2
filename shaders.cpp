@@ -46,6 +46,7 @@ int Engine::shaderProgram::getAndSaveUniform(string var){
         vars[var] = uniId;
         return 0;
     }
+    return 0;
 }
 
 int Engine::shaderProgram::Uniform1f(string var, GLfloat v0){

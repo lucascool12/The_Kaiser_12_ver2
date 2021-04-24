@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 
-#define WINDOW_WIDTH 600
+#define WINDOW_WIDTH 600    //tranformations is tied to these numbers
 #define WINDOW_HEIGHT 600
 
 using std::vector;

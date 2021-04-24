@@ -31,6 +31,7 @@ int timeSnapshot;
 GLuint rot;
 GLuint oPos;
 GLuint scale;
+GLuint window;
 
 void Init() {
     programID = CompileAllShaders();// trans vert
@@ -44,6 +45,8 @@ void Init() {
     rot = glGetUniformLocation(programID,"rotAngle");
     oPos = glGetUniformLocation(programID,"oPos");
     scale = glGetUniformLocation(programID,"scale");
+    window = glGetUniformLocation(programID,"w");
+
     GLuint temp_array[2];
     glGenBuffers(2, temp_array);
     vBufferObjID = temp_array[0];
@@ -58,14 +61,17 @@ void transform(GLfloat oPos1,GLfloat oPos2, GLfloat s, GLfloat rotate){
     glUniform2f(oPos,oPos1,oPos2);
     glUniform1f(scale,s);
     glUniform1f(rot,rotate*(M_PI)/180.0);
+    glUniform2f(window,(float)glutGet(GLUT_WINDOW_WIDTH),(float)glutGet(GLUT_WINDOW_HEIGHT));
 }
 
 void Display(){
     glClear(GL_COLOR_BUFFER_BIT);
-
+    printf("%d %d %f %f\n",glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT),(float)glutGet(GLUT_WINDOW_WIDTH)/600.0,
+    (float)glutGet(GLUT_WINDOW_HEIGHT)/600.0);
     glUseProgram(programID);
     //glUniform1f(elapsedTimeUniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
-    transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,-0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,-0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    //transform(0.5,0,1,0);
     //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
     glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
     glEnableVertexAttribArray(0);
@@ -77,7 +83,8 @@ void Display(){
     glDisableVertexAttribArray(0);
 
     
-    transform((-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1+0.5,0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.5,(-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    transform((-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1+0.5,0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.25,(-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    //transform(-0.5,0,1,0);
     //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
     glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
     glEnableVertexAttribArray(0);
