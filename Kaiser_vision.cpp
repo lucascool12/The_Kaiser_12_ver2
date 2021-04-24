@@ -16,7 +16,8 @@ GLuint programID;
 GLfloat verts[] = {
         -0.5,  0.5,
         0.5,  0.5,
-        0,  -0.5
+        -0.5,  -0.5,
+        0.5,  -0.5
     };
 
 // GLuint elapsedTimeUniform;
@@ -32,6 +33,12 @@ GLuint rot;
 GLuint oPos;
 GLuint scale;
 GLuint window;
+GLuint vaoId;
+
+GLuint order[] = {
+        0,  1,  2,
+        1,  2,  3
+    };
 
 void Init() {
     programID = CompileAllShaders();// trans vert
@@ -47,15 +54,50 @@ void Init() {
     scale = glGetUniformLocation(programID,"scale");
     window = glGetUniformLocation(programID,"w");
 
+    
+
+
     GLuint temp_array[2];
     glGenBuffers(2, temp_array);
     vBufferObjID = temp_array[0];
     vBufferObjID2 = temp_array[1];
-    glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0); //clears buffer
+    
+    glBindBuffer(GL_ARRAY_BUFFER,vBufferObjID);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(verts),verts,GL_STREAM_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vBufferObjID2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(order),order,GL_STREAM_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+
+
+    glGenVertexArrays(1,&vaoId);
+
+    glBindVertexArray(vaoId);
+    glBindBuffer(GL_ARRAY_BUFFER,vBufferObjID);
+
+    
+    printf("%d\n",sizeof(verts));
+    
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vBufferObjID2);
+    printf("%d\n",sizeof(order));
+
+    
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+
+
+
+
+    // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0); //clears buffer
 }
 void transform(GLfloat oPos1,GLfloat oPos2, GLfloat s, GLfloat rotate){
     glUniform2f(oPos,oPos1,oPos2);
@@ -66,40 +108,78 @@ void transform(GLfloat oPos1,GLfloat oPos2, GLfloat s, GLfloat rotate){
 
 void Display(){
     glClear(GL_COLOR_BUFFER_BIT);
-    printf("%d %d %f %f\n",glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT),(float)glutGet(GLUT_WINDOW_WIDTH)/600.0,
-    (float)glutGet(GLUT_WINDOW_HEIGHT)/600.0);
+    //printf("%d %d %f %f\n",glutGet(GLUT_WINDOW_WIDTH),glutGet(GLUT_WINDOW_HEIGHT),(float)glutGet(GLUT_WINDOW_WIDTH)/600.0,
+    //(float)glutGet(GLUT_WINDOW_HEIGHT)/600.0);
+
+
     glUseProgram(programID);
-    //glUniform1f(elapsedTimeUniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
-    transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,-0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
-    //transform(0.5,0,1,0);
-    //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
-    glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glDisableVertexAttribArray(0);
+    printf("test1");
+    glBindVertexArray(vaoId);
+    
+    // glBindBuffer(GL_ARRAY_BUFFER,vBufferObjID);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vBufferObjID2);
+    // //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,vBufferObjID2);
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,0,0);
+    printf("test2");
+    transform(0,0,1,0);
+    //printf("test3 %d\n",sizeof( order ) / (sizeof( order[0] ) * (sizeof( order ) != sizeof(void*) || sizeof( order[0] ) <= sizeof(void*))));
+    //glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,nullptr);
+    printf("test4");
+    glBindVertexArray(0);
+
+
+
+    // transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,-0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    // //transform(0.5,0,1,0);
+    // //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    
+
+
+    // //glUniform1f(elapsedTimeUniform, glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
+    // transform((glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,-0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    // //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID);
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // glDisableVertexAttribArray(0);
 
     
-    transform((-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1+0.5,0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.25,(-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
-    //transform(-0.5,0,1,0);
-    //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
-    glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    // transform((-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1+0.5,0.2,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1.25,(-glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    // //printf("%f  %f\n",(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*1-0.5,(glutGet(GLUT_ELAPSED_TIME)%5000)/5000.0*360);
+    // glBindBuffer(GL_ARRAY_BUFFER, vBufferObjID2);
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
+
 
     glDisableVertexAttribArray(0);
-
-
+    printf("test5\n");
     glBindBuffer(GL_ARRAY_BUFFER,0);
+    printf("test6\n");
     glUseProgram(0);
+    printf("test7\n");
     glutSwapBuffers();
-    glutPostRedisplay();
+    printf("test8\n");
+    //glutPostRedisplay();
 }
 
 void MakeWindow(int argc, char **argv){
